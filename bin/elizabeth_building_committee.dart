@@ -1,6 +1,7 @@
 import 'dart:io' as io;
 import 'dart:math';
 
+import 'package:elizabeth_building_committee/committe_report_entry.dart';
 import 'package:gcloud/storage.dart';
 import 'package:googleapis/drive/v3.dart';
 import 'package:googleapis/storage/v1.dart';
@@ -28,14 +29,31 @@ var _gDriveClient;
 var _gSheetClient;
 Storage? _storage;
 
+var entries = <CommitteeReportEntry>[];
+
 void main(List<String> arguments) async {
   await _initializeClient();
 
-    await testCSV();
+  await testCSV();
+
   // await testGoogleStorageListBuckets();
   //await testGSheetsFolders();
 
-  // await testGSheets();
+  await testGSheets();
+
+  var sb = StringBuffer(CommitteeReportEntry.csvTitles());
+  sb.writeln('');
+  {
+    var listList = <List<String>>[];
+    for (var entry in entries) {
+      listList.add(entry.toList());
+    }
+    var convertor = ListToCsvConverter();
+    sb.writeln(convertor.convert(listList));
+  }
+
+  print(sb.toString());
+
   io.exit(0);
 }
 
@@ -91,32 +109,34 @@ Future<bool> testCSV() async {
             state = _State.vendorData;
             break;
           }
-          String date = row[0];
+          var entry = CommitteeReportEntry(
+            CommitteeReportEntrySource.FAM_report_csv,
+            description: row[3],
+            dateString: row[0],
+            vendor: vendor,
+            fullFocusWOReference: row[2],
+            type: row[4],
+            budgetedItem: row[5],
+            reserve: row[6],
+            cost: row[7],
+            status: row[8],
+          );
 
-          String fullFocusWOReference = row[2];
-          String description = row[3];
-          String type = row[4];
-
-          String budgetedItem = row[5];
-          String reserve = row[6];
-          String cost = row[7];
-          String status = row[8];
-
-          if (date.isEmpty && vendor.isEmpty && description.isEmpty) {
+          if (entry.dateString.isEmpty &&
+              entry.vendor.isEmpty &&
+              entry.description.isEmpty) {
             state = _State.initial;
             break;
           }
 
-          print('$date:\n\tvendor: $vendor,\n\tref: $fullFocusWOReference,'
-              '\n\tdescription: $description'
-              ',\n\ttype: $type,\n\tbudget?: $budgetedItem,'
-              '\n\treserve?: $reserve,\n\tcost: $cost,\n\tstatus: $status');
+          entries.add(entry);
           break;
       }
     } else {
       state = _State.initial;
     }
   }
+
   return true;
 }
 
@@ -173,7 +193,17 @@ Future<bool> testGSheets() async {
     print(row);
     for (var r = 1; r <= min(20, sheet.rowCount); r++) {
       var row = await sheet.values.row(r);
-      print('   $r: $row');
+      var entry = CommitteeReportEntry(
+        CommitteeReportEntrySource.GSheets,
+        item: row[0],
+        vendor: row[1],
+        description: row[2],
+        cost: row[3],
+        dateString: row[4],
+        completed: row[5],
+        status: row[6],
+      );
+      entries.add(entry);
     }
   }
   print('done: $spreadsheet');
