@@ -4,7 +4,7 @@ description: A sample command-line application.
 # homepage: https://www.example.com
 
 environment:
-  sdk: ">=2.13.0-52.0.dev <3.0.0"
+  sdk: ">=2.13.0-137.0.dev <3.0.0"
 
 dependencies:
   flutter:
@@ -14,6 +14,7 @@ dependencies:
   gcloud: ^0.7.3
   googleapis: ^0.56.1
   googleapis_auth: ^0.2.12+1
+  excel: ^1.1.5
 #  path: ^1.7.0
 
 dev_dependencies:

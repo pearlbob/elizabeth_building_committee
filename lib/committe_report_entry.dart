@@ -1,12 +1,12 @@
 import 'package:csv/csv.dart';
+import 'package:excel/excel.dart';
 
 enum CommitteeReportEntrySource {
   FAM_report_csv,
   GSheets,
 }
 
-String CommitteeReportEntrySourceAbbreviation(
-    CommitteeReportEntrySource source) {
+String CommitteeReportEntrySourceAbbreviation(CommitteeReportEntrySource source) {
   switch (source) {
     case CommitteeReportEntrySource.FAM_report_csv:
       return 'FAM';
@@ -25,14 +25,14 @@ class CommitteeReportEntry {
     item = '',
     description = '',
     dateString = '',
-    vendor= '',
-    fullFocusWOReference= '',
-    type= '',
-    budgetedItem= '',
-    reserve= '',
-    cost= '',
-    status= '',
-    completed= '',
+    vendor = '',
+    fullFocusWOReference = '',
+    type = '',
+    budgetedItem = '',
+    reserve = '',
+    cost = '',
+    status = '',
+    completed = '',
   })  : item = item,
         description = description,
         dateString = dateString,
@@ -62,8 +62,7 @@ class CommitteeReportEntry {
   String toJSON() {
     var sb = StringBuffer();
     sb.writeln('{');
-    sb.writeln(
-        '\t"source": "${CommitteeReportEntrySourceAbbreviation(source)}",');
+    sb.writeln('\t"source": "${CommitteeReportEntrySourceAbbreviation(source)}",');
     sb.writeln('\t"dateString": "$dateString",');
     sb.writeln('\t"fullFocusWOReference": "$fullFocusWOReference",');
     sb.writeln('\t"vendor": "$vendor",');
@@ -79,8 +78,93 @@ class CommitteeReportEntry {
     return sb.toString();
   }
 
+  void toXlsx(Sheet sheet, int row) {
+    final dataCellRightStyle = CellStyle(
+      //fontFamily: getFontFamily(FontFamily.Calibri),
+      //textWrapping: TextWrapping.WrapText,
+      horizontalAlign: HorizontalAlign.Right,
+    );
+    final dataCellLeftStyle = CellStyle(
+      //fontFamily: getFontFamily(FontFamily.Calibri),
+      textWrapping: TextWrapping.WrapText,
+      horizontalAlign: HorizontalAlign.Left,
+    );
+    final dataCellCenterStyle = CellStyle(
+      //fontFamily: getFontFamily(FontFamily.Calibri),
+      textWrapping: TextWrapping.WrapText,
+      horizontalAlign: HorizontalAlign.Center,
+    );
+
+    var i = 0;
+
+    var cell = sheet.cell(CellIndex.indexByColumnRow(rowIndex: row, columnIndex: i++));
+    cell.value = CommitteeReportEntrySourceAbbreviation(source);
+    cell.cellStyle = dataCellCenterStyle;
+
+     cell = sheet.cell(CellIndex.indexByColumnRow(rowIndex: row, columnIndex: i++));
+    cell.value = dateString;
+    cell.cellStyle = dataCellRightStyle;
+
+    cell = sheet.cell(CellIndex.indexByColumnRow(rowIndex: row, columnIndex: i++));
+    cell.value = fullFocusWOReference;
+    cell.cellStyle = dataCellLeftStyle;
+
+    cell = sheet.cell(CellIndex.indexByColumnRow(rowIndex: row, columnIndex: i++));
+    cell.value = vendor;
+    cell.cellStyle = dataCellCenterStyle;
+
+    cell = sheet.cell(CellIndex.indexByColumnRow(rowIndex: row, columnIndex: i++));
+    cell.value = item;
+    cell.cellStyle = dataCellLeftStyle;
+
+    cell = sheet.cell(CellIndex.indexByColumnRow(rowIndex: row, columnIndex: i++));
+    cell.value = description;
+    cell.cellStyle = dataCellLeftStyle;
+
+    cell = sheet.cell(CellIndex.indexByColumnRow(rowIndex: row, columnIndex: i++));
+    cell.value = type;
+    cell.cellStyle = dataCellCenterStyle;
+
+    cell = sheet.cell(CellIndex.indexByColumnRow(rowIndex: row, columnIndex: i++));
+    cell.value = budgetedItem;
+    cell.cellStyle = dataCellCenterStyle;
+
+    cell = sheet.cell(CellIndex.indexByColumnRow(rowIndex: row, columnIndex: i++));
+    cell.value = reserve;
+    cell.cellStyle = dataCellCenterStyle;
+
+    cell = sheet.cell(CellIndex.indexByColumnRow(rowIndex: row, columnIndex: i++));
+    cell.value = cost;
+    cell.cellStyle = dataCellRightStyle;
+
+    cell = sheet.cell(CellIndex.indexByColumnRow(rowIndex: row, columnIndex: i++));
+    cell.value = status;
+    cell.cellStyle = dataCellCenterStyle;
+
+    cell = sheet.cell(CellIndex.indexByColumnRow(rowIndex: row, columnIndex: i++));
+    cell.value = completed;
+    cell.cellStyle = dataCellCenterStyle;
+  }
+
+  static List<String> get titles => _titles;
+
+  static final _titles = <String>[
+    'Source',
+    'Date String',
+    'Full Focus WO Reference',
+    'Vendor',
+    'Item',
+    'Description',
+    'Type',
+    'Budgeted Item',
+    'Reserve',
+    'Cost',
+    'Status',
+    'Completed',
+  ];
+
   static String csvTitles() {
-    return         'Source,'
+    return 'Source,'
         'Date String,'
         'Full Focus WO Reference,'
         'Vendor,'
