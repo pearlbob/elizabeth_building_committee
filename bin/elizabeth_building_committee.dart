@@ -198,6 +198,9 @@ String homePath() {
 class ElizabethBuildingCommittee {
   ElizabethBuildingCommittee() {
     _styles['Est. Cost'] = _dataCellRightStyle;
+    _styles['Condo ID'] = _dataCellClipStyle;
+    _styles['Asset ID'] = _dataCellClipStyle;
+    _styles['Item ID'] = _dataCellClipStyle;
   }
 
   Future<bool> processFile(String filePathAsString) async {
@@ -250,7 +253,7 @@ class ElizabethBuildingCommittee {
     fontFamily: getFontFamily(FontFamily.Calibri),
     bold: true,
     textWrapping: TextWrapping.WrapText,
-    // underline: Underline.Single,
+    horizontalAlign: HorizontalAlign.Center,
   );
 
   final _dataCellRightStyle = CellStyle(
@@ -268,6 +271,11 @@ class ElizabethBuildingCommittee {
     textWrapping: TextWrapping.WrapText,
     horizontalAlign: HorizontalAlign.Center,
   );
+  final _dataCellClipStyle = CellStyle(
+    //fontFamily: getFontFamily(FontFamily.Calibri),
+    textWrapping: TextWrapping.Clip,
+    horizontalAlign: HorizontalAlign.Center,
+  );
 
   Future<bool> output() async {
     var excel = Excel.createExcel();
@@ -276,7 +284,7 @@ class ElizabethBuildingCommittee {
       // 0,  // Blank Column
       // 1,  // Condo ID
       // 2,  // Asset ID
-      // 3,  // Item ID
+       3,  // Item ID
       // 4,  // Condo Name
       // 5, // Asset Category
       // 6, // Unknown 20-170?
