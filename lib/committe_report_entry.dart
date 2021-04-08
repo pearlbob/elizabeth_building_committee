@@ -1,4 +1,3 @@
-import 'package:csv/csv.dart';
 import 'package:excel/excel.dart';
 
 enum CommitteeReportEntrySource {
@@ -101,7 +100,7 @@ class CommitteeReportEntry {
     cell.value = CommitteeReportEntrySourceAbbreviation(source);
     cell.cellStyle = dataCellCenterStyle;
 
-     cell = sheet.cell(CellIndex.indexByColumnRow(rowIndex: row, columnIndex: i++));
+    cell = sheet.cell(CellIndex.indexByColumnRow(rowIndex: row, columnIndex: i++));
     cell.value = dateString;
     cell.cellStyle = dataCellRightStyle;
 

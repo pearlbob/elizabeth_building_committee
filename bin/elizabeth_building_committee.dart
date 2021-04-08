@@ -3,6 +3,8 @@ import 'dart:io';
 
 import 'package:csv/csv.dart';
 import 'package:elizabeth_building_committee/committe_report_entry.dart';
+import 'package:elizabeth_building_committee/elizabethValveChart.dart';
+import 'package:elizabeth_building_committee/homePath.dart';
 import 'package:excel/excel.dart';
 
 var entries = <CommitteeReportEntry>[];
@@ -12,8 +14,9 @@ void main(List<String> arguments) async {
 
   //await testXlsx();
 
-  await ElizabethBuildingCommittee()
-      .processFile('${homePath()}/junk/excel_file.xlsx');
+  // await ElizabethBuildingCommittee()
+  //     .processFile('${homePath()}/junk/excel_file.xlsx');
+  await ElizabethValveChart().processFile('${homePath()}/junk/excel_valve_chart.xlsx');
 
   exit(0);
 }
@@ -25,8 +28,7 @@ enum _State {
 }
 
 Future<bool> testCSV() async {
-  var csvAsString = File('./lib/assets/maintenance_test_report_20210128.csv')
-      .readAsStringSync();
+  var csvAsString = File('./lib/assets/maintenance_test_report_20210128.csv').readAsStringSync();
   //print( csvAsString);
   var rowsAsListOfValues = const CsvToListConverter().convert(csvAsString);
   var state = _State.initial;
@@ -64,9 +66,7 @@ Future<bool> testCSV() async {
             status: row[8],
           );
 
-          if (entry.dateString.isEmpty &&
-              entry.vendor.isEmpty &&
-              entry.description.isEmpty) {
+          if (entry.dateString.isEmpty && entry.vendor.isEmpty && entry.description.isEmpty) {
             state = _State.initial;
             break;
           }
@@ -159,8 +159,7 @@ Future<bool> testXlsx() async {
     {
       var i = 0;
       for (var title in CommitteeReportEntry.titles) {
-        var cell = sheet
-            .cell(CellIndex.indexByColumnRow(rowIndex: row, columnIndex: i++));
+        var cell = sheet.cell(CellIndex.indexByColumnRow(rowIndex: row, columnIndex: i++));
         cell.value = title;
         cell.cellStyle = titleCellStyle;
       }
@@ -180,19 +179,6 @@ Future<bool> testXlsx() async {
   });
 
   return true;
-}
-
-String homePath() {
-  var home = '';
-  var envVars = Platform.environment;
-  if (Platform.isMacOS) {
-    home = envVars['HOME'] ?? '';
-  } else if (Platform.isLinux) {
-    home = envVars['HOME'] ?? '';
-  } else if (Platform.isWindows) {
-    home = envVars['UserProfile'] ?? '';
-  }
-  return home;
 }
 
 class ElizabethBuildingCommittee {
@@ -284,7 +270,7 @@ class ElizabethBuildingCommittee {
       // 0,  // Blank Column
       // 1,  // Condo ID
       // 2,  // Asset ID
-       3,  // Item ID
+      3, // Item ID
       // 4,  // Condo Name
       // 5, // Asset Category
       // 6, // Unknown 20-170?
@@ -311,24 +297,17 @@ class ElizabethBuildingCommittee {
       {
         var i = 0;
         for (var outputColumn in outputColumns) {
-          sheet.updateCell(
-              CellIndex.indexByColumnRow(rowIndex: 0, columnIndex: i),
-              _columnNames[outputColumn],
+          sheet.updateCell(CellIndex.indexByColumnRow(rowIndex: 0, columnIndex: i), _columnNames[outputColumn],
               cellStyle: _titleCellStyle);
           i++;
         }
       }
 
       var orderedRows = SplayTreeSet<_OrderedRow>();
-      {
-        //  sort the rows, tossing the first
-        var r = 0;
-        for (var map in _rows) {
-          if (r > 0) {
-            orderedRows.add(_OrderedRow(map));
-          }
-          r++;
-        }
+
+      //  sort the rows
+      for (var map in _rows) {
+        orderedRows.add(_OrderedRow(map));
       }
 
       {
@@ -337,9 +316,7 @@ class ElizabethBuildingCommittee {
           var i = 0;
           for (var outputColumn in outputColumns) {
             var name = _columnNames[outputColumn];
-            sheet.updateCell(
-                CellIndex.indexByColumnRow(rowIndex: r + 1, columnIndex: i++),
-                row.map[name],
+            sheet.updateCell(CellIndex.indexByColumnRow(rowIndex: r + 1, columnIndex: i++), row.map[name],
                 cellStyle: _styles[name] ?? _dataCellLeftStyle);
           }
           r++;
@@ -404,13 +381,7 @@ class _OrderedRow implements Comparable<_OrderedRow> {
       return ret;
     }
 
-    for (var id in [
-      'Asset Ref',
-      'Asset Name',
-      'Task',
-      'Description',
-      'Item ID'
-    ]) {
+    for (var id in ['Asset Ref', 'Asset Name', 'Task', 'Description', 'Item ID']) {
       ret = map[id]?.compareTo(other.map[id] ?? '');
       if (ret != null && ret != 0) {
         return ret;
@@ -466,5 +437,5 @@ int _frequencyColumnSortIndex(String? s) {
     return -1;
   }
 
-  return int.parse(m.group(1)!) * 365;//   units of days
+  return int.parse(m.group(1)!) * 365; //   units of days
 }
