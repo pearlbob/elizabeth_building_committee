@@ -101,6 +101,8 @@ class ElizabethValveChart {
 
       //  look for columns
       {
+        final _columnAmpersandThruRegexp =
+            RegExp(r'(\d\d) *\& *(\d\d) UNITS (\d\d?)TH THRU.? (\d\d?)TH FLOORS', caseSensitive: false);
         var matches = _columnAmpersandThruRegexp.allMatches(valveFunction);
         if (matches.isNotEmpty) {
           for (var m in matches) {
@@ -125,6 +127,7 @@ class ElizabethValveChart {
 
       //  look for THRU units
       {
+        final _thruUnitNumberRegexp = RegExp(r'(\d\d\d\d?) +thru\.? +(\d\d\d\d?)', caseSensitive: false);
         var matches = _thruUnitNumberRegexp.allMatches(valveFunction);
         if (matches.isNotEmpty) {
           for (var m in matches) {
@@ -143,6 +146,7 @@ class ElizabethValveChart {
 
       //  look for - units
       {
+        final _dashUnitNumberRegexp = RegExp(r'(\d\d\d\d?) *- *(\d\d\d\d?)');
         var matches = _dashUnitNumberRegexp.allMatches(valveFunction);
         if (matches.isNotEmpty) {
           for (var m in matches) {
@@ -161,6 +165,10 @@ class ElizabethValveChart {
       }
 
       {
+        final _columnAmpersandItemsThruRegexp = RegExp(
+            r'(\d\d) *\& *(\d\d) (?:kitchens|baths|units|BATH/KITCHEN|KITCHEN/BATH),?'
+            r' (\d\d?)(?:rd|th)-(\d\d?)th ?(?:FL)?',
+            caseSensitive: false);
         var matches = _columnAmpersandItemsThruRegexp.allMatches(valveFunction);
         if (matches.isNotEmpty) {
           for (var m in matches) {
@@ -172,7 +180,7 @@ class ElizabethValveChart {
             assert(firstFloor < lastFloor);
             assert(firstFloor >= 3);
             assert(lastFloor <= 13);
-            //  print('_columnAmpersandItemsThruRegexp: $firstUnit -> $lastUnit, ${firstFloor}-${lastFloor}FL : $valveFunction');
+            //      print('_columnAmpersandItemsThruRegexp: $firstUnit -> $lastUnit, $firstFloor-${lastFloor}FL : $valveFunction');
             for (var floor = min(4, firstFloor); floor <= lastFloor; floor++) {
               addByUnitMatches(floor * 100 + firstUnit, row);
               addByUnitMatches(floor * 100 + lastUnit, row);
@@ -183,6 +191,9 @@ class ElizabethValveChart {
       }
 
       {
+        final _columnUnitItemsThruRegexp = RegExp(
+            r'(\d\d) * (?:kitchens|baths|units|BATH/KITCHEN),? (\d\d?)(?:rd|th) +thru +(\d\d?)th FL',
+            caseSensitive: false);
         var matches = _columnUnitItemsThruRegexp.allMatches(valveFunction);
         if (matches.isNotEmpty) {
           for (var m in matches) {
@@ -202,6 +213,9 @@ class ElizabethValveChart {
       }
 
       {
+        final _columnItemsThruRegexp = RegExp(
+            r' (\d\d) (?:kitchens|baths|units|BATH/KITCHEN) (\d\d?)(?:rd|th)-(\d\d?)th FL',
+            caseSensitive: false);
         var matches = _columnItemsThruRegexp.allMatches(valveFunction);
         if (matches.isNotEmpty) {
           for (var m in matches) {
@@ -220,6 +234,10 @@ class ElizabethValveChart {
         }
       }
       {
+        final _columnComboItemsThruRegexp = RegExp(
+            r' (\d\d) (?:kitchens|baths|units|BATH/KITCHEN|KITCHEN/BATH), (\d\d) (?:kitchens|bath|baths|units|BATH/KITCHEN|KITCHEN/BATH)'
+            r' (\d\d?)(?:rd|th)-(\d\d?)th FL',
+            caseSensitive: false);
         var matches = _columnComboItemsThruRegexp.allMatches(valveFunction);
         if (matches.isNotEmpty) {
           for (var m in matches) {
@@ -241,33 +259,131 @@ class ElizabethValveChart {
       }
 
       {
-        var matches = _forFloorRegexp.allMatches(valveFunction);
+        var firstFloor = 4;
+        var lastFloor = 13;
+        // CIRCUIT SETTER 09 & 10 BATHS
+        // CIRCUIT SETTER 10 & 11 KITCHENS
+        // CIRCUIT SETTER 10 KITCHENS & 11 BATHS
+        // CIRCUIT SETTER 09 KITCHENS & 08 BATHS
+        // CIRCUIT SETTER 08 KITCHEN/BATH & 09 KITCHEN 8TH-13TH
+        final _circuitSetterKitchensBathsRegexp =
+            RegExp(r'^ *CIRCUIT SETTER +(\d\d) (?:kitchens|kitchen/bath)? *\& +(\d\d) *(?:kitchens|baths|kitchen)'
+            r' *$', caseSensitive: false);
+        var matches = _circuitSetterKitchensBathsRegexp.allMatches(valveFunction);
         if (matches.isNotEmpty) {
           for (var m in matches) {
-            var firstFloor = int.parse(m.group(1) ?? '0');
-            print('      _forFloorRegexp: ${row.valveNumber}: $firstFloor,  $valveFunction');
+            var firstUnit = int.parse(m.group(1) ?? '0');
+            var lastUnit = int.parse(m.group(2) ?? '0');
+            // print('            _circuitSetterKitchensBathsRegexp: v${row.valveNumber}:'
+            //     ' $firstUnit-$lastUnit on $firstFloor-$lastFloor floor, $valveFunction');
+            for (var floor = firstFloor; floor <= lastFloor; floor++) {
+              addByUnitMatches(floor * 100 + firstUnit, row);
+              addByUnitMatches(floor * 100 + lastUnit, row);
+            }
           }
           continue;
         }
       }
 
       {
-        var matches = _forFlRegexp.allMatches(valveFunction);
+        var firstFloor = 4;
+        var lastFloor = 13;
+        // CIRCUIT SETTER 08 KITCHENS
+        final _circuitSetterKitchensRegexp = RegExp(r'^ *CIRCUIT SETTER +(\d\d) (?:kitchens) *$', caseSensitive: false);
+        var matches = _circuitSetterKitchensRegexp.allMatches(valveFunction);
         if (matches.isNotEmpty) {
           for (var m in matches) {
-            print('_forFlRegexp: ${row.valveNumber}: ${m.group(0)} $valveFunction');
+            var unit = int.parse(m.group(1) ?? '0');
+            print(
+                '            _circuitSetterKitchensRegexp: v${row.valveNumber}: $unit on $firstFloor-$lastFloor floor, $valveFunction');
+            for (var floor = firstFloor; floor <= lastFloor; floor++) {
+              addByUnitMatches(floor * 100 + unit, row);
+            }
           }
           continue;
         }
       }
 
-      //  look for individually named units
-      for (var m in _unitNumberRegexp.allMatches(valveFunction)) {
-        var unit = int.parse(m.group(1) ?? '0');
-        addByUnitMatches(unit, row);
+      // {
+      //   final _forFloorRegexp = RegExp(r'(\d\d?)TH FLoor', caseSensitive: false);
+      //   var matches = _forFloorRegexp.allMatches(valveFunction);
+      //   if (matches.isNotEmpty) {
+      //     for (var m in matches) {
+      //       var firstFloor = int.parse(m.group(1) ?? '0');
+      //       print('      _forFloorRegexp: ${row.valveNumber}: $firstFloor,  $valveFunction');
+      //     }
+      //     continue;
+      //   }
+      // }
+      //
+      // {
+      //   final _forFlRegexp = RegExp(r'(\d\d?)TH FL', caseSensitive: false);
+      //   var matches = _forFlRegexp.allMatches(valveFunction);
+      //   if (matches.isNotEmpty) {
+      //     for (var m in matches) {
+      //       print('_forFlRegexp: ${row.valveNumber}: ${m.group(0)} $valveFunction');
+      //     }
+      //     continue;
+      //   }
+      // }
+
+      {
+        //  look for individually named units
+        final _unitNumberRegexp = RegExp(r'(\d\d\d\d?)');
+        for (var m in _unitNumberRegexp.allMatches(valveFunction)) {
+          var unit = int.parse(m.group(1) ?? '0');
+          addByUnitMatches(unit, row);
+        }
       }
     }
 
+    //  find all the valves used in byUnit
+    {
+      var units = SplayTreeSet<int>();
+      var valves = SplayTreeSet<int>();
+      for (var unit in byUnit.keys) {
+        units.add(unit);
+        for (var orderedRow in byUnit[unit]?.toList() ?? []) {
+          valves.add(orderedRow.valveNumber);
+        }
+      }
+
+      for (var row in _orderedRows) {
+        if (valves.contains(row.valveNumber)) {
+          continue;
+        }
+        //print('$row');
+        addByUnitMatches(9999, row);  //  valves unassociated with a unit
+      }
+
+      if (false) {
+        var lastUnit = 0;
+        for (var unit in units) {
+          if (unit != lastUnit + 1) {
+            if (lastUnit > 0) {
+              print('   to unit $lastUnit');
+            }
+            print('from unit $unit');
+          }
+          lastUnit = unit;
+        }
+        print('   to unit ${units.last}');
+
+        print('');
+        print('valves');
+        var lastValve = 0;
+        for (var valve in valves) {
+          if (valve != lastValve + 1) {
+            if (lastValve > 0) {
+              print('   to valve $lastValve');
+            }
+            print('from valve $valve');
+          }
+          lastValve = valve;
+        }
+        print('   to valve ${valves.last}');
+      }
+    }
     // for (var unit in SplayTreeSet.from(byUnit.keys)) {
     //   print('$unit:');
     //   for (var row in byUnit[unit] ?? <_OrderedRow>[]) {
@@ -365,7 +481,7 @@ class ElizabethValveChart {
   var _columnNames = [];
   final _styles = <String, CellStyle>{};
   var _rows = <Map<String, String>>[];
-  var _orderedRows = SplayTreeSet<_OrderedRow>();
+  final _orderedRows = SplayTreeSet<_OrderedRow>();
 
   Map<int, Set<_OrderedRow>> byUnit = {};
 }
@@ -426,24 +542,3 @@ int _unitMax(int floor) {
       return 17;
   }
 }
-
-final RegExp _unitNumberRegexp = RegExp(r'(\d\d\d\d?)');
-final RegExp _thruUnitNumberRegexp = RegExp(r'(\d\d\d\d?) +thru\.? +(\d\d\d\d?)', caseSensitive: false);
-final RegExp _dashUnitNumberRegexp = RegExp(r'(\d\d\d\d?) *- *(\d\d\d\d?)');
-final RegExp _thFloorRegexp = RegExp(r'(\d\d) *th floor', caseSensitive: false);
-final RegExp _columnAmpersandThruRegexp =
-    RegExp(r'(\d\d) *\& *(\d\d) UNITS (\d\d?)TH THRU.? (\d\d?)TH FLOORS', caseSensitive: false);
-final RegExp _columnUnitItemsThruRegexp = RegExp(
-    r'(\d\d) * (?:kitchens|baths|units|BATH/KITCHEN),? (\d\d?)(?:rd|th) +thru +(\d\d?)th FL',
-    caseSensitive: false);
-final RegExp _columnAmpersandItemsThruRegexp = RegExp(
-    r'(\d\d) *\& *(\d\d) (?:kitchens|baths|units|BATH/KITCHEN),? (\d\d?)(?:rd|th)-(\d\d?)th FL',
-    caseSensitive: false);
-final RegExp _columnItemsThruRegexp =
-    RegExp(r' (\d\d) (?:kitchens|baths|units|BATH/KITCHEN) (\d\d?)(?:rd|th)-(\d\d?)th FL', caseSensitive: false);
-final RegExp _columnComboItemsThruRegexp = RegExp(
-    r' (\d\d) (?:kitchens|baths|units|BATH/KITCHEN|KITCHEN/BATH), (\d\d) (?:kitchens|bath|baths|units|BATH/KITCHEN|KITCHEN/BATH)'
-    r' (\d\d?)(?:rd|th)-(\d\d?)th FL',
-    caseSensitive: false);
-final RegExp _forFloorRegexp = RegExp(r'(\d\d?)TH FLoor', caseSensitive: false);
-final RegExp _forFlRegexp = RegExp(r'(\d\d?)TH FL', caseSensitive: false);

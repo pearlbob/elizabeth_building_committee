@@ -180,7 +180,7 @@
         <entry key="http_multi_server">
           <value>
             <list>
-              <option value="$USER_HOME$/installs/flutter/latest/.pub-cache/hosted/pub.dartlang.org/http_multi_server-3.0.0/lib" />
+              <option value="$USER_HOME$/installs/flutter/latest/.pub-cache/hosted/pub.dartlang.org/http_multi_server-3.0.1/lib" />
             </list>
           </value>
         </entry>
@@ -507,7 +507,7 @@
       <root url="file://$USER_HOME$/installs/flutter/latest/.pub-cache/hosted/pub.dartlang.org/googleapis_auth-0.2.12+1/lib" />
       <root url="file://$USER_HOME$/installs/flutter/latest/.pub-cache/hosted/pub.dartlang.org/gsheets-0.3.0-dev.1/lib" />
       <root url="file://$USER_HOME$/installs/flutter/latest/.pub-cache/hosted/pub.dartlang.org/http-0.12.2/lib" />
-      <root url="file://$USER_HOME$/installs/flutter/latest/.pub-cache/hosted/pub.dartlang.org/http_multi_server-3.0.0/lib" />
+      <root url="file://$USER_HOME$/installs/flutter/latest/.pub-cache/hosted/pub.dartlang.org/http_multi_server-3.0.1/lib" />
       <root url="file://$USER_HOME$/installs/flutter/latest/.pub-cache/hosted/pub.dartlang.org/http_parser-3.1.4/lib" />
       <root url="file://$USER_HOME$/installs/flutter/latest/.pub-cache/hosted/pub.dartlang.org/image-2.1.19/lib" />
       <root url="file://$USER_HOME$/installs/flutter/latest/.pub-cache/hosted/pub.dartlang.org/intl-0.17.0/lib" />
