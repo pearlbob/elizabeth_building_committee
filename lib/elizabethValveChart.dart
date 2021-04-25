@@ -259,16 +259,41 @@ class ElizabethValveChart {
       }
 
       {
+        // CIRCUIT SETTER 05 & 06 KITCHENS 8TH-13TH FL
+        // CIRCUIT SETTER 08 KITCHEN/BATH & 09 KITCHEN 8TH-13TH
+        final _circuitSetterKitchensBathsRegexp = RegExp(
+            r'^ *CIRCUIT SETTER +(\d\d) (?:kitchens|kitchen/bath)? *\& +(\d\d) *(?:kitchens|baths|kitchen)'
+            r' (\d\d?)(?:rd|th)-(\d\d?)th *(?:fl)? *$',
+            caseSensitive: false);
+        var matches = _circuitSetterKitchensBathsRegexp.allMatches(valveFunction);
+        if (matches.isNotEmpty) {
+          for (var m in matches) {
+            var firstUnit = int.parse(m.group(1) ?? '0');
+            var lastUnit = int.parse(m.group(2) ?? '0');
+            var firstFloor = int.parse(m.group(3) ?? '0');
+            var lastFloor = int.parse(m.group(4) ?? '0');
+            print('            _circuitSetterKitchensBathsRegexp: v${row.valveNumber}:'
+                ' $firstUnit-$lastUnit on $firstFloor-$lastFloor floor, $valveFunction');
+            for (var floor = firstFloor; floor <= lastFloor; floor++) {
+              addByUnitMatches(floor * 100 + firstUnit, row);
+              addByUnitMatches(floor * 100 + lastUnit, row);
+            }
+          }
+          continue;
+        }
+      }
+
+      {
         var firstFloor = 4;
         var lastFloor = 13;
         // CIRCUIT SETTER 09 & 10 BATHS
         // CIRCUIT SETTER 10 & 11 KITCHENS
         // CIRCUIT SETTER 10 KITCHENS & 11 BATHS
         // CIRCUIT SETTER 09 KITCHENS & 08 BATHS
-        // CIRCUIT SETTER 08 KITCHEN/BATH & 09 KITCHEN 8TH-13TH
-        final _circuitSetterKitchensBathsRegexp =
-            RegExp(r'^ *CIRCUIT SETTER +(\d\d) (?:kitchens|kitchen/bath)? *\& +(\d\d) *(?:kitchens|baths|kitchen)'
-            r' *$', caseSensitive: false);
+        final _circuitSetterKitchensBathsRegexp = RegExp(
+            r'^ *CIRCUIT SETTER +(\d\d) (?:kitchens|kitchen/bath)? *\& +(\d\d) *(?:kitchens|baths|kitchen)'
+            r' *$',
+            caseSensitive: false);
         var matches = _circuitSetterKitchensBathsRegexp.allMatches(valveFunction);
         if (matches.isNotEmpty) {
           for (var m in matches) {
@@ -353,7 +378,7 @@ class ElizabethValveChart {
           continue;
         }
         //print('$row');
-        addByUnitMatches(9999, row);  //  valves unassociated with a unit
+        addByUnitMatches(9999, row); //  valves unassociated with a unit
       }
 
       if (false) {
