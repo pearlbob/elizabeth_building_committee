@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:csv/csv.dart';
 import 'package:elizabeth_building_committee/committe_report_entry.dart';
+import 'package:elizabeth_building_committee/eliz_5_year_reserve_plan.dart';
 import 'package:elizabeth_building_committee/elizabethValveChart.dart';
 import 'package:elizabeth_building_committee/homePath.dart';
 import 'package:excel/excel.dart';
@@ -16,7 +17,9 @@ void main(List<String> arguments) async {
 
   // await ElizabethBuildingCommittee()
   //     .processFile('${homePath()}/junk/excel_file.xlsx');
-  await ElizabethValveChart().processFile('${homePath()}/junk/excel_valve_chart.xlsx');
+  //  this doesn't work!!!!   await ElizabethValveChart().processFile('${homePath()}/junk/excel_valve_chart.xlsx');
+
+  Elizabeth5YearReservePlan(File('Eliz_5_year_reserve_plan.csv'));
 
   exit(0);
 }
